@@ -383,6 +383,14 @@ input::placeholder, textarea::placeholder { color: var(--text-faint); }
 .sidebar-footer-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
 .sidebar-expand-catcher { position: fixed; top: 0; left: 0; width: var(--sidebar-w-collapsed); height: 100vh; z-index: 5; cursor: pointer; }
 
+.sidebar-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(4, 62, 108, 0.45);
+  z-index: 25;
+}
+
+.mobile-menu-btn { display: none; }
+
 /* ============ MAIN CONTENT ============ */
 .main-content { flex: 1; overflow-y: auto; position: relative; background: var(--bg); display: flex; flex-direction: column; }
 
@@ -504,13 +512,69 @@ input::placeholder, textarea::placeholder { color: var(--text-faint); }
 }
 
 /* ============ RESPONSIVE ============ */
-@media (max-width: 720px) {
+
+/* ---- Tablet: keep the icon-rail collapse behaviour, just float it ---- */
+@media (max-width: 900px) and (min-width: 601px) {
   .sidebar { position: fixed; z-index: 20; height: 100vh; }
   .sidebar:not(.collapsed) { box-shadow: 0 0 0 100vmax rgba(4,62,108,0.3); }
-  .main-header { flex-wrap: wrap; padding: 16px 18px; }
-  .folder-view { padding: 0 18px 24px; }
-  .folder-view-header h2 { font-size: 20px; }
-  .top-buttons { padding: 0 18px 16px; }
+}
+
+/* ---- Mobile: true off-canvas drawer, full-width content, touch sizing ---- */
+@media (max-width: 600px) {
+  html, body { overflow-x: hidden; }
+
+  .auth-screen { padding: 16px; }
+  .auth-card { padding: 26px 20px 22px; }
+
+  /* sidebar becomes a slide-in drawer, fully hidden when closed */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 82vw;
+    max-width: 300px;
+    transform: translateX(-100%);
+    z-index: 30;
+    box-shadow: 4px 0 30px rgba(4, 62, 108, 0.35);
+  }
+  .sidebar.collapsed { width: 82vw; max-width: 300px; } /* never use the icon-rail width on mobile */
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-expand-catcher { display: none; } /* replaced by the backdrop on mobile */
+
+  .mobile-menu-btn { display: flex; width: 36px; height: 36px; flex-shrink: 0; }
+
+  /* header: hamburger + small logo on one row, full-width search below */
+  .main-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 14px 8px;
+  }
+  .main-logo { height: 24px; flex: 1; }
+  .search-box { order: 3; width: 100%; max-width: none; padding: 8px 12px; }
+  .signout-btn { display: none; } /* logout already reachable from the sidebar footer */
+
+  .top-buttons { padding: 0 14px 14px; gap: 8px; }
+  .top-buttons .btn { flex: 1 1 0; padding: 10px 8px; }
+
+  .folder-view { padding: 0 14px 20px; }
+  .folder-view-header h2 { font-size: 18px; }
+
+  .empty-state { padding: 32px 20px; }
+  .empty-state img { width: 56px; height: 56px; }
+  .empty-state h2 { font-size: 17px; }
+
+  .task-card { padding: 12px; }
+
+  /* comfortable touch targets */
+  .icon-btn { width: 34px; height: 34px; }
+  .task-row-actions .icon-btn { width: 30px; height: 30px; }
+  .folder-row { padding: 11px 10px; }
+
+  .modal-overlay { padding: 14px; }
+  .task-modal { padding: 18px; max-width: none; }
+  .task-title-input { font-size: 17px; }
+  .task-desc-input { min-height: 110px; }
+  .task-modal-actions .btn { flex: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

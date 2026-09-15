@@ -66,12 +66,19 @@ async function enterApp() {
   renderAll();
 }
 
-// ============ SIDEBAR COLLAPSE / EXPAND ============
+// ============ SIDEBAR COLLAPSE / EXPAND (tablet+ icon rail) ============
 
 const sidebar = document.getElementById('sidebar');
 const expandCatcher = document.getElementById('sidebar-expand-catcher');
+const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const isMobileWidth = () => window.matchMedia('(max-width: 600px)').matches;
 
 document.getElementById('sidebar-toggle').addEventListener('click', () => {
+  if (isMobileWidth()) {
+    closeMobileSidebar();
+    return;
+  }
   sidebar.classList.add('collapsed');
   expandCatcher.classList.remove('hidden');
 });
@@ -84,12 +91,27 @@ expandCatcher.addEventListener('click', expandSidebar);
 
 // Pressing on any part of a collapsed sidebar expands it
 sidebar.addEventListener('click', (e) => {
-  if (sidebar.classList.contains('collapsed')) {
+  if (sidebar.classList.contains('collapsed') && !isMobileWidth()) {
     expandSidebar();
     e.stopPropagation();
     e.preventDefault();
   }
 }, true);
+
+// ============ MOBILE SIDEBAR DRAWER ============
+
+function openMobileSidebar() {
+  sidebar.classList.add('mobile-open');
+  sidebarBackdrop.classList.remove('hidden');
+}
+
+function closeMobileSidebar() {
+  sidebar.classList.remove('mobile-open');
+  sidebarBackdrop.classList.add('hidden');
+}
+
+mobileMenuBtn.addEventListener('click', openMobileSidebar);
+sidebarBackdrop.addEventListener('click', closeMobileSidebar);
 
 // ============ NEW FOLDER ============
 
@@ -218,6 +240,7 @@ function selectFolder(folderId) {
   State.activeFolderId = folderId;
   State.activeSpecial = null;
   renderAll();
+  if (isMobileWidth()) closeMobileSidebar();
 }
 
 function selectSpecial(special) {
@@ -230,6 +253,7 @@ function selectSpecial(special) {
   State.activeSpecial = special;
   State.activeFolderId = null;
   renderAll();
+  if (isMobileWidth()) closeMobileSidebar();
 }
 
 async function confirmDeleteFolder(folderId) {
