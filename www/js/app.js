@@ -177,6 +177,14 @@ document.getElementById('folder-list').addEventListener('click', handleFolderLis
 document.querySelector('.special-folders').addEventListener('click', handleSpecialFoldersClick);
 
 function handleFolderListClick(e) {
+  // A click that immediately follows a successful long-press-triggered
+  // rename is the browser's synthetic click after pointerup - swallow it
+  // so it doesn't also navigate to the folder.
+  if (longPressTriggered) {
+    longPressTriggered = false;
+    return;
+  }
+
   const item = e.target.closest('.folder-item');
   if (!item) return;
   const folderId = Number(item.dataset.folderId);
@@ -194,20 +202,15 @@ function handleFolderListClick(e) {
     return;
   }
 
-  const nameEl = e.target.closest('[data-action="rename-target"]');
-  if (nameEl) {
-    if (nameEl.contentEditable === 'true') return; // already editing
-
-    const now = Date.now();
-    const last = renameClickTimestamps[folderId] || 0;
-    if (now - last < 400) {
-      // second tap/click within the window -> enter rename mode, skip the toggle
-      renameClickTimestamps[folderId] = 0;
-      startRenameEditing(nameEl, folderId);
-      return;
-    }
-    renameClickTimestamps[folderId] = now;
+  const chevron = e.target.closest('[data-action="toggle-expand"]');
+  if (chevron) {
+    e.stopPropagation();
+    toggleFolderExpand(folderId);
+    return;
   }
+
+  const nameEl = e.target.closest('[data-action="rename-target"]');
+  if (nameEl && nameEl.contentEditable === 'true') return; // already editing, let it be
 
   const row = e.target.closest('[data-action="select-folder"]');
   if (row) {
@@ -215,7 +218,60 @@ function handleFolderListClick(e) {
   }
 }
 
-const renameClickTimestamps = {};
+function toggleFolderExpand(folderId) {
+  if (State.expandedFolderIds.has(folderId)) {
+    State.expandedFolderIds.delete(folderId);
+  } else {
+    State.expandedFolderIds.add(folderId);
+  }
+  renderSidebar();
+}
+
+// ============ HOLD-TO-RENAME (folders) ============
+
+const LONG_PRESS_MS = 550;
+const LONG_PRESS_MOVE_CANCEL_PX = 10;
+let longPressTimer = null;
+let longPressTriggered = false;
+let longPressStartX = 0;
+let longPressStartY = 0;
+
+function cancelLongPress() {
+  clearTimeout(longPressTimer);
+  longPressTimer = null;
+}
+
+document.getElementById('folder-list').addEventListener('pointerdown', (e) => {
+  const row = e.target.closest('.folder-row[data-action="select-folder"]');
+  if (!row) return;
+  if (e.target.closest('[data-action="toggle-expand"]')) return;
+  if (e.target.closest('[data-action="delete-folder"]')) return;
+
+  const nameEl = row.querySelector('[data-action="rename-target"]');
+  if (nameEl && nameEl.contentEditable === 'true') return; // already editing
+
+  const item = row.closest('.folder-item');
+  const folderId = Number(item.dataset.folderId);
+  longPressStartX = e.clientX;
+  longPressStartY = e.clientY;
+
+  cancelLongPress();
+  longPressTimer = setTimeout(() => {
+    longPressTriggered = true;
+    beginRenameFolder(folderId);
+  }, LONG_PRESS_MS);
+});
+
+document.getElementById('folder-list').addEventListener('pointermove', (e) => {
+  if (!longPressTimer) return;
+  const dx = Math.abs(e.clientX - longPressStartX);
+  const dy = Math.abs(e.clientY - longPressStartY);
+  if (dx > LONG_PRESS_MOVE_CANCEL_PX || dy > LONG_PRESS_MOVE_CANCEL_PX) cancelLongPress();
+});
+
+document.getElementById('folder-list').addEventListener('pointerup', cancelLongPress);
+document.getElementById('folder-list').addEventListener('pointerleave', cancelLongPress);
+document.getElementById('folder-list').addEventListener('pointercancel', cancelLongPress);
 
 function handleSpecialFoldersClick(e) {
   const taskAction = e.target.closest('[data-action]');
@@ -231,12 +287,6 @@ function handleSpecialFoldersClick(e) {
 }
 
 function selectFolder(folderId) {
-  const alreadyExpanded = State.expandedFolderIds.has(folderId);
-  if (alreadyExpanded) {
-    State.expandedFolderIds.delete(folderId);
-  } else {
-    State.expandedFolderIds.add(folderId);
-  }
   State.activeFolderId = folderId;
   State.activeSpecial = null;
   renderAll();

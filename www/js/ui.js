@@ -65,7 +65,7 @@ function renderRegularFolders() {
 
     item.innerHTML = `
       <div class="folder-row" role="button" tabindex="0" data-action="select-folder">
-        <svg class="icon folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5 L16 12 L9 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="icon folder-chevron" data-action="toggle-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5 L16 12 L9 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <img class="icon folder-icon" src="${ICON.folder}" alt="" />
         <span class="folder-name label-text" data-action="rename-target">${escapeHtml(folder.name)}</span>
         <span class="folder-count label-text">${tasks.length}</span>

@@ -251,6 +251,9 @@ input::placeholder, textarea::placeholder { color: var(--text-faint); }
   transition: background var(--transition), color var(--transition);
   text-align: left;
   color: var(--primary);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .folder-row:hover { background: var(--primary); color: var(--white); }
 .folder-row:hover .folder-icon path { fill: var(--white); }
@@ -261,10 +264,17 @@ input::placeholder, textarea::placeholder { color: var(--text-faint); }
 
 .folder-chevron {
   flex-shrink: 0;
-  transition: transform var(--transition);
+  transition: transform var(--transition), background var(--transition);
   color: currentColor;
   opacity: 0.7;
+  cursor: pointer;
+  padding: 8px;
+  margin: -8px;
+  box-sizing: content-box;
+  border-radius: 50%;
 }
+.folder-chevron:hover { opacity: 1; background: rgba(255, 255, 255, 0.3); }
+.folder-row:hover .folder-chevron:hover { background: rgba(255, 255, 255, 0.3); }
 .folder-item.expanded .folder-chevron { transform: rotate(90deg); }
 .sidebar.collapsed .folder-chevron { display: none; }
 
@@ -280,7 +290,10 @@ input::placeholder, textarea::placeholder { color: var(--text-faint); }
   font-size: 13.5px;
   outline: none;
 }
-.folder-name[contenteditable="true"] { background: var(--white); border-radius: 4px; padding: 1px 4px; cursor: text; color: var(--text-dark); }
+.folder-name[contenteditable="true"] {
+  background: var(--white); border-radius: 4px; padding: 1px 4px; cursor: text; color: var(--text-dark);
+  -webkit-user-select: text; user-select: text;
+}
 
 .folder-count {
   font-size: 10.5px;
