@@ -42,3 +42,16 @@ jobs:
           name: dragon-mind-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Commit APK back to repo
+        if: github.event_name == 'push'
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk dist/dragon-mind-debug.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/dragon-mind-debug.apk
+          if ! git diff --cached --quiet; then
+            git commit -m "Update built debug APK [skip ci]"
+            git push
+          fi
