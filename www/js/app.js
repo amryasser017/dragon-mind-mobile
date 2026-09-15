@@ -283,7 +283,27 @@ function handleSpecialFoldersClick(e) {
   const item = e.target.closest('.folder-item.special');
   if (!item) return;
   const special = item.dataset.special;
-  selectSpecial(special);
+
+  const chevron = e.target.closest('[data-action="toggle-expand"]');
+  if (chevron) {
+    e.stopPropagation();
+    toggleSpecialExpand(special);
+    return;
+  }
+
+  const row = e.target.closest('[data-action="select-special"]');
+  if (row) {
+    selectSpecial(special);
+  }
+}
+
+function toggleSpecialExpand(special) {
+  if (State.expandedSpecial.has(special)) {
+    State.expandedSpecial.delete(special);
+  } else {
+    State.expandedSpecial.add(special);
+  }
+  renderSidebar();
 }
 
 function selectFolder(folderId) {
@@ -294,12 +314,6 @@ function selectFolder(folderId) {
 }
 
 function selectSpecial(special) {
-  const alreadyExpanded = State.expandedSpecial.has(special);
-  if (alreadyExpanded) {
-    State.expandedSpecial.delete(special);
-  } else {
-    State.expandedSpecial.add(special);
-  }
   State.activeSpecial = special;
   State.activeFolderId = null;
   renderAll();

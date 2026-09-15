@@ -70,7 +70,8 @@
 
       <nav class="special-folders">
         <div class="folder-item special" data-special="done" id="folder-done">
-          <div class="folder-row" role="button" tabindex="0">
+          <div class="folder-row" role="button" tabindex="0" data-action="select-special">
+            <svg class="icon folder-chevron" data-action="toggle-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5 L16 12 L9 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <img class="icon folder-icon" src="assets/icons/completed.svg" alt="" />
             <span class="folder-name label-text">Completed Flames</span>
             <span class="folder-count label-text" id="done-count">0</span>
@@ -79,7 +80,8 @@
         </div>
 
         <div class="folder-item special" data-special="deleted" id="folder-deleted">
-          <div class="folder-row" role="button" tabindex="0">
+          <div class="folder-row" role="button" tabindex="0" data-action="select-special">
+            <svg class="icon folder-chevron" data-action="toggle-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 5 L16 12 L9 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <img class="icon folder-icon" src="assets/icons/trash-folder.svg" alt="" />
             <span class="folder-name label-text">Trash</span>
             <span class="folder-count label-text" id="deleted-count">0</span>
